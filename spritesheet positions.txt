@@ -1,0 +1,27 @@
+// board
+top left 6,5
+bottom right 806,549
+
+// dice 1
+top left 5,556
+bottom right 249,800
+
+// dice 2
+top left 255,556
+bottom right 499,800
+
+// dice 3
+top left 505,556
+bottom right 749,800
+
+// dice 4
+top left 5,806
+bottom right 249,1050
+
+// dice 5
+top left 255,806
+bottom right 499,1050
+
+//dice 6
+top left 505,806
+bottom right 749,1050
