@@ -19,6 +19,7 @@
         font-family: 'Cinzel', serif;
         margin: 0;
         height: 100vh;
+        width: 100vw;
         overflow: hidden;
         display: flex;
         justify-content: center;
@@ -27,94 +28,109 @@
     }
 
     #menu {
-        position: absolute;
-        z-index: 999;
-        background: rgba(0,0,0,0.95);
-        width: 100%;
-        height: 100%;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(11, 11, 11, 0.95);
+        z-index: 2000;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: 30px;
+        transition: opacity 0.5s;
     }
 
     h1 {
         color: var(--gold);
-        font-size: 4em;
+        font-size: 5em;
         margin: 0;
-        text-shadow: 0 0 20px var(--gold);
+        text-shadow: 0 0 30px var(--gold);
+        letter-spacing: 5px;
     }
 
     .btn {
         background: transparent;
         color: #fff;
         font-family: inherit;
-        font-size: 1.5em;
-        padding: 15px 40px;
-        border: 2px solid var(--gold);
+        font-size: 1.8em;
+        padding: 15px 60px;
+        border: 3px solid var(--gold);
         cursor: pointer;
         transition: 0.2s;
-        min-width: 200px;
         text-transform: uppercase;
     }
 
     .btn:hover {
         background: var(--gold);
         color: #000;
-        box-shadow: 0 0 20px var(--gold);
+        box-shadow: 0 0 30px var(--gold);
+        transform: scale(1.05);
     }
 
-    #game-wrapper {
-        transform-origin: center center;
+    #game-stage {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 20px;
+        gap: 40px;
+        width: 1000px; 
+        height: 1400px;
+        transform-origin: center center;
     }
 
-    .hud {
+    .hud-row {
         width: 800px;
         display: flex;
         justify-content: space-between;
-        font-size: 2em;
+        font-size: 2.5em;
         color: var(--gold);
         text-transform: uppercase;
-        text-shadow: 2px 2px 0 #000;
+        text-shadow: 2px 2px 4px #000;
     }
 
-    .board {
+    .board-container {
         position: relative;
+        width: 800px;
+        height: 544px;
+    }
+
+    .board-bg {
         width: 800px;
         height: 544px;
         background-image: var(--sprite);
         background-position: -6px -5px;
-        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+        background-repeat: no-repeat;
+        position: absolute;
+        top: 0; left: 0;
+        z-index: 0;
+        filter: drop-shadow(0 10px 20px #000);
     }
 
-    .grid {
+    .grid-overlay {
         position: absolute;
-        top: 30px;
-        left: 40px;
-        width: 720px;
-        height: 480px;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 10;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        z-index: 10;
+        padding: 40px 50px;
+        box-sizing: border-box;
     }
 
     .column {
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        padding-top: 25px;
+        padding-top: 20px;
         cursor: pointer;
-        transition: background 0.1s;
+        transition: background 0.15s;
     }
 
     .column:hover {
-        background: rgba(212, 175, 55, 0.1);
+        background: rgba(212, 175, 55, 0.15);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
     }
 
     .die {
@@ -122,15 +138,19 @@
         height: 244px;
         background-image: var(--sprite);
         background-repeat: no-repeat;
-        transform: scale(0.7);
-        margin-top: -75px;
-        margin-bottom: -75px;
+        transform: scale(0.8); 
+        margin-top: -90px;
+        margin-bottom: -90px;
         pointer-events: none;
-        filter: drop-shadow(0 5px 5px rgba(0,0,0,0.8));
+        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8));
+        transition: transform 0.2s;
     }
+    
+    .die.new { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-    .die:first-child {
-        margin-top: 0;
+    @keyframes popIn {
+        0% { transform: scale(0); }
+        100% { transform: scale(0.8); }
     }
 
     .d1 { background-position: -5px -556px; }
@@ -140,36 +160,43 @@
     .d5 { background-position: -255px -806px; }
     .d6 { background-position: -505px -806px; }
 
-    #controls {
+    .die:first-child { margin-top: 0; }
+
+    #control-bar {
         position: fixed;
         bottom: 30px;
+        z-index: 1000;
+        background: rgba(0,0,0,0.9);
+        border: 2px solid var(--gold);
+        border-radius: 100px;
+        padding: 10px 40px;
         display: flex;
+        gap: 30px;
         align-items: center;
-        gap: 20px;
-        background: rgba(0,0,0,0.8);
-        padding: 15px 30px;
-        border: 1px solid var(--gold);
-        border-radius: 50px;
-        z-index: 100;
+        box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        transform: scale(0.8);
     }
 
-    #preview-box {
-        width: 80px;
-        height: 80px;
+    #status-text {
+        color: #ccc;
+        font-size: 24px;
+        width: 300px;
+        text-align: center;
+    }
+
+    #current-die-box {
+        width: 100px;
+        height: 100px;
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-    
-    .mini-die {
-        transform: scale(0.35); 
+        position: relative;
     }
 
-    #status {
-        min-width: 200px;
-        text-align: center;
-        font-size: 1.2em;
-        color: #ccc;
+    .preview-die {
+        transform: scale(0.4) !important;
+        margin: 0 !important;
+        position: absolute;
     }
 
     .hidden { display: none !important; }
@@ -180,222 +207,233 @@
 
 <div id="menu">
     <h1>KNUCKLEBONES</h1>
-    <button class="btn" onclick="startGame(true)">Vs Computer</button>
-    <button class="btn" onclick="startGame(false)">Vs Player</button>
+    <button class="btn" onclick="startGame(true)">Play vs Bot</button>
+    <button class="btn" onclick="startGame(false)">2 Player Local</button>
 </div>
 
-<div id="game-wrapper">
-    <!-- Top Player (P2/Bot) -->
-    <div class="hud">
-        <span id="p2-name">Opponent</span>
-        <span id="score-p2">0</span>
-    </div>
-    <div class="board">
-        <div class="grid" id="grid-p2"></div>
+<div id="game-stage">
+    
+    <div>
+        <div class="hud-row">
+            <span id="p2-name">Opponent</span>
+            <span id="score-p2">0</span>
+        </div>
+        <div class="board-container">
+            <div class="board-bg"></div>
+            <div class="grid-overlay" id="grid-p2"></div>
+        </div>
     </div>
 
-    <!-- Bottom Player (P1) -->
-    <div class="board">
-        <div class="grid" id="grid-p1"></div>
+    <div>
+        <div class="board-container">
+            <div class="board-bg"></div>
+            <div class="grid-overlay" id="grid-p1"></div>
+        </div>
+        <div class="hud-row">
+            <span>Player 1</span>
+            <span id="score-p1">0</span>
+        </div>
     </div>
-    <div class="hud">
-        <span>Player 1</span>
-        <span id="score-p1">0</span>
-    </div>
+
 </div>
 
-<div id="controls" class="hidden">
-    <div id="status">Roll the dice</div>
-    <div id="preview-box"></div>
-    <button class="btn" id="roll-btn" onclick="rollDice()">ROLL</button>
+<div id="control-bar" class="hidden">
+    <div id="status-text">Welcome</div>
+    <div id="current-die-box"></div>
+    <button class="btn" id="action-btn" onclick="rollDie()">ROLL</button>
 </div>
 
 <script>
     const state = {
-        p1: [[], [], []],
-        p2: [[], [], []],
+        p1: [[],[],[]],
+        p2: [[],[],[]],
         turn: 1,
-        die: 0,
-        isBot: true,
-        over: false
+        heldDie: 0,
+        isBot: false,
+        gameOver: false
     };
 
     function startGame(vsBot) {
         state.isBot = vsBot;
         document.getElementById('p2-name').innerText = vsBot ? "The Fox" : "Player 2";
-        document.getElementById('menu').classList.add('hidden');
-        document.getElementById('controls').classList.remove('hidden');
-        resizeGame();
-        render();
+        document.getElementById('menu').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('control-bar').classList.remove('hidden');
+            resize();
+            updateStatus("Player 1's Turn");
+        }, 500);
     }
 
-    function rollDice() {
-        if (state.die !== 0 || state.over) return;
-        
-        // If bot mode and it's bot turn, disable button
+    function rollDie() {
+        if (state.heldDie !== 0 || state.gameOver) return;
         if (state.isBot && state.turn === 2) return;
 
-        const btn = document.getElementById('roll-btn');
+        const btn = document.getElementById('action-btn');
         btn.disabled = true;
-
-        let rolls = 0;
+        
+        let frames = 0;
         const anim = setInterval(() => {
-            const val = Math.ceil(Math.random() * 6);
-            showPreview(val);
-            rolls++;
-            if (rolls > 10) {
+            renderPreview(Math.ceil(Math.random() * 6));
+            frames++;
+            if(frames > 10) {
                 clearInterval(anim);
-                state.die = Math.ceil(Math.random() * 6);
-                showPreview(state.die);
-                updateStatus(`Place a ${state.die}`);
+                const val = Math.ceil(Math.random() * 6);
+                state.heldDie = val;
+                renderPreview(val);
+                updateStatus(`Place ${val}`);
             }
         }, 50);
     }
 
-    function handleInput(player, col) {
-        if (state.over || state.die === 0) return;
+    function handleColumnClick(player, colIdx) {
+        if (state.gameOver || state.heldDie === 0) return;
         if (player !== state.turn) return;
-        if (state.isBot && player === 2) return; 
-
-        const board = player === 1 ? state.p1 : state.p2;
         
-        if (board[col].length < 3) {
-            placeDie(player, col);
-        } else {
+        const board = player === 1 ? state.p1 : state.p2;
+        if (board[colIdx].length >= 3) {
             updateStatus("Column Full!");
+            return;
         }
+
+        commitMove(player, colIdx);
     }
 
-    function placeDie(player, col) {
-        const board = player === 1 ? state.p1 : state.p2;
-        const enemy = player === 1 ? state.p2 : state.p1;
-
-        board[col].push(state.die);
+    function commitMove(player, colIdx) {
+        const myBoard = player === 1 ? state.p1 : state.p2;
+        const oppBoard = player === 1 ? state.p2 : state.p1;
         
-        // Destroy Mechanic
-        enemy[col] = enemy[col].filter(val => val !== state.die);
+        myBoard[colIdx].push(state.heldDie);
 
-        const val = state.die;
-        state.die = 0;
-        document.getElementById('preview-box').innerHTML = '';
-        document.getElementById('roll-btn').disabled = false;
+        const val = state.heldDie;
+        let destroyed = false;
+        oppBoard[colIdx] = oppBoard[colIdx].filter(v => {
+            if(v === val) { destroyed = true; return false; }
+            return true;
+        });
+
+        state.heldDie = 0;
+        document.getElementById('current-die-box').innerHTML = '';
+        document.getElementById('action-btn').disabled = false;
         
-        render();
+        renderBoard();
 
         if (checkFull(state.p1) || checkFull(state.p2)) {
             endGame();
+            return;
+        }
+
+        state.turn = state.turn === 1 ? 2 : 1;
+        
+        if (state.isBot && state.turn === 2) {
+            updateStatus("Opponent Thinking...");
+            document.getElementById('action-btn').disabled = true;
+            setTimeout(botRoutine, 800);
         } else {
-            state.turn = state.turn === 1 ? 2 : 1;
-            const pName = state.turn === 1 ? "Player 1" : (state.isBot ? "The Fox" : "Player 2");
-            updateStatus(`${pName}'s Turn`);
-            
-            if (state.isBot && state.turn === 2) {
-                document.getElementById('roll-btn').disabled = true;
-                setTimeout(botTurn, 1000);
-            }
+            updateStatus(state.turn === 1 ? "Player 1's Turn" : "Player 2's Turn");
         }
     }
 
-    function botTurn() {
-        let rolls = 0;
+    function botRoutine() {
+        let frames = 0;
         const anim = setInterval(() => {
-            showPreview(Math.ceil(Math.random() * 6));
-            rolls++;
-            if (rolls > 10) {
+            renderPreview(Math.ceil(Math.random() * 6));
+            frames++;
+            if(frames > 8) {
                 clearInterval(anim);
                 const val = Math.ceil(Math.random() * 6);
-                showPreview(val);
-                state.die = val;
-                
+                state.heldDie = val;
+                renderPreview(val);
+
                 setTimeout(() => {
-                    const valid = [0,1,2].filter(i => state.p2[i].length < 3);
-                    if(valid.length > 0) {
-                        // Smart-ish bot: prioritize columns that destroy P1 dice
-                        let best = valid[0];
-                        for(let c of valid) {
-                            if (state.p1[c].includes(val)) best = c;
-                        }
-                        placeDie(2, best);
+                    const validCols = [0,1,2].filter(i => state.p2[i].length < 3);
+                    if(validCols.length === 0) { endGame(); return; }
+
+                    let choice = validCols[Math.floor(Math.random() * validCols.length)];
+                    for (let c of validCols) {
+                        if (state.p1[c].includes(val)) choice = c;
                     }
-                }, 800);
+                    
+                    commitMove(2, choice);
+                }, 600);
             }
         }, 50);
     }
 
-    function checkFull(board) {
-        return board.flat().length + board.reduce((a,b)=>a+b.length,0) === 18; // wait, wrong logic
-        // Correct: Sum lengths
-        let total = 0;
-        for(let c of board) total += c.length;
-        return total === 9;
-    }
-
-    function calcScore(board) {
-        let total = 0;
-        for(let col of board) {
-            let counts = {};
-            col.forEach(x => counts[x] = (counts[x] || 0) + 1);
-            for(let x in counts) total += x * counts[x] * counts[x];
-        }
-        return total;
-    }
-
-    function render() {
+    function renderBoard() {
         drawGrid(1);
         drawGrid(2);
         document.getElementById('score-p1').innerText = calcScore(state.p1);
         document.getElementById('score-p2').innerText = calcScore(state.p2);
     }
 
-    function drawGrid(pId) {
-        const div = document.getElementById(`grid-p${pId}`);
-        div.innerHTML = '';
-        const board = pId === 1 ? state.p1 : state.p2;
+    function drawGrid(pid) {
+        const board = pid === 1 ? state.p1 : state.p2;
+        const container = document.getElementById(`grid-p${pid}`);
+        container.innerHTML = '';
 
         for(let i=0; i<3; i++) {
             const colDiv = document.createElement('div');
             colDiv.className = 'column';
-            colDiv.onclick = () => handleInput(pId, i);
-            
+            colDiv.onclick = () => handleColumnClick(pid, i);
+
             board[i].forEach(val => {
                 const d = document.createElement('div');
-                d.className = `die d${val}`;
+                d.className = `die d${val} new`;
                 colDiv.appendChild(d);
             });
-            div.appendChild(colDiv);
+            container.appendChild(colDiv);
         }
     }
 
-    function showPreview(val) {
-        const box = document.getElementById('preview-box');
-        box.innerHTML = `<div class="die d${val} mini-die"></div>`;
+    function calcScore(board) {
+        let total = 0;
+        board.forEach(col => {
+            const counts = {};
+            col.forEach(n => counts[n] = (counts[n] || 0) + 1);
+            for(let n in counts) total += n * (counts[n] ** 2);
+        });
+        return total;
+    }
+
+    function checkFull(board) {
+        let diceCount = 0;
+        board.forEach(c => diceCount += c.length);
+        return diceCount === 9;
+    }
+
+    function renderPreview(val) {
+        document.getElementById('current-die-box').innerHTML = `<div class="die d${val} preview-die"></div>`;
     }
 
     function updateStatus(msg) {
-        document.getElementById('status').innerText = msg;
+        document.getElementById('status-text').innerText = msg;
     }
 
     function endGame() {
-        state.over = true;
+        state.gameOver = true;
         const s1 = calcScore(state.p1);
         const s2 = calcScore(state.p2);
-        const msg = s1 > s2 ? "PLAYER 1 WINS!" : (s2 > s1 ? "OPPONENT WINS!" : "DRAW!");
+        let msg = "DRAW";
+        if (s1 > s2) msg = "PLAYER 1 WINS!";
+        if (s2 > s1) msg = state.isBot ? "THE FOX WINS!" : "PLAYER 2 WINS!";
+        
         updateStatus(msg);
-        const btn = document.getElementById('roll-btn');
+        const btn = document.getElementById('action-btn');
         btn.innerText = "RESTART";
         btn.disabled = false;
         btn.onclick = () => location.reload();
     }
 
-    function resizeGame() {
-        const game = document.getElementById('game-wrapper');
+    function resize() {
+        const stage = document.getElementById('game-stage');
         const h = window.innerHeight;
-        // Base height needed approx 1200px
-        const scale = Math.min(1, (h - 100) / 1200);
-        game.style.transform = `scale(${scale})`;
+        const w = window.innerWidth;
+        const scale = Math.min(w / 1100, h / 1450); 
+        stage.style.transform = `scale(${scale})`;
     }
 
-    window.onresize = resizeGame;
+    window.addEventListener('resize', resize);
 
 </script>
 </body>
