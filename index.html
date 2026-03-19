@@ -31,7 +31,7 @@
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: rgba(11, 11, 11, 0.95);
+        background: rgba(11, 11, 11, 0.98);
         z-index: 2000;
         display: flex;
         flex-direction: column;
@@ -113,8 +113,9 @@
         z-index: 10;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        padding: 40px 50px;
+        padding: 40px 60px; /* Adjusted to match artwork columns */
         box-sizing: border-box;
+        gap: 10px;
     }
 
     .column {
@@ -125,12 +126,13 @@
         justify-content: flex-start;
         padding-top: 20px;
         cursor: pointer;
-        transition: background 0.15s;
+        transition: background 0.1s;
+        border-radius: 10px;
     }
 
     .column:hover {
-        background: rgba(212, 175, 55, 0.15);
-        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        background: rgba(212, 175, 55, 0.1);
+        box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.2);
     }
 
     .die {
@@ -138,11 +140,11 @@
         height: 244px;
         background-image: var(--sprite);
         background-repeat: no-repeat;
-        transform: scale(0.8); 
-        margin-top: -90px;
-        margin-bottom: -90px;
+        transform: scale(0.75); 
+        margin-top: -95px; /* Tighter overlap for perspective */
+        margin-bottom: -95px;
         pointer-events: none;
-        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8));
+        filter: drop-shadow(0 5px 10px rgba(0,0,0,0.9));
         transition: transform 0.2s;
     }
     
@@ -150,9 +152,10 @@
 
     @keyframes popIn {
         0% { transform: scale(0); }
-        100% { transform: scale(0.8); }
+        100% { transform: scale(0.75); }
     }
 
+    /* Dice Face Coordinates */
     .d1 { background-position: -5px -556px; }
     .d2 { background-position: -255px -556px; }
     .d3 { background-position: -505px -556px; }
@@ -169,24 +172,23 @@
         background: rgba(0,0,0,0.9);
         border: 2px solid var(--gold);
         border-radius: 100px;
-        padding: 10px 40px;
+        padding: 10px 50px;
         display: flex;
-        gap: 30px;
+        gap: 40px;
         align-items: center;
-        box-shadow: 0 0 30px rgba(0,0,0,0.8);
-        transform: scale(0.8);
+        box-shadow: 0 0 50px rgba(0,0,0,0.9);
     }
 
     #status-text {
         color: #ccc;
         font-size: 24px;
-        width: 300px;
+        min-width: 250px;
         text-align: center;
     }
 
     #current-die-box {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -194,12 +196,12 @@
     }
 
     .preview-die {
-        transform: scale(0.4) !important;
+        transform: scale(0.35) !important;
         margin: 0 !important;
         position: absolute;
     }
 
-    .hidden { display: none !important; }
+    .hidden { display: none !important; pointer-events: none; }
 
 </style>
 </head>
@@ -213,6 +215,7 @@
 
 <div id="game-stage">
     
+    <!-- OPPONENT BOARD -->
     <div>
         <div class="hud-row">
             <span id="p2-name">Opponent</span>
@@ -224,6 +227,7 @@
         </div>
     </div>
 
+    <!-- PLAYER BOARD -->
     <div>
         <div class="board-container">
             <div class="board-bg"></div>
@@ -257,10 +261,13 @@
         state.isBot = vsBot;
         document.getElementById('p2-name').innerText = vsBot ? "The Fox" : "Player 2";
         document.getElementById('menu').style.opacity = '0';
+        
+        renderBoard();
+        resize();
+
         setTimeout(() => {
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('control-bar').classList.remove('hidden');
-            resize();
             updateStatus("Player 1's Turn");
         }, 500);
     }
@@ -276,14 +283,14 @@
         const anim = setInterval(() => {
             renderPreview(Math.ceil(Math.random() * 6));
             frames++;
-            if(frames > 10) {
+            if(frames > 12) {
                 clearInterval(anim);
                 const val = Math.ceil(Math.random() * 6);
                 state.heldDie = val;
                 renderPreview(val);
-                updateStatus(`Place ${val}`);
+                updateStatus(`Place a ${val}`);
             }
-        }, 50);
+        }, 60);
     }
 
     function handleColumnClick(player, colIdx) {
@@ -330,7 +337,8 @@
             document.getElementById('action-btn').disabled = true;
             setTimeout(botRoutine, 800);
         } else {
-            updateStatus(state.turn === 1 ? "Player 1's Turn" : "Player 2's Turn");
+            const pName = state.turn === 1 ? "Player 1" : "Player 2";
+            updateStatus(`${pName}'s Turn`);
         }
     }
 
@@ -339,7 +347,7 @@
         const anim = setInterval(() => {
             renderPreview(Math.ceil(Math.random() * 6));
             frames++;
-            if(frames > 8) {
+            if(frames > 10) {
                 clearInterval(anim);
                 const val = Math.ceil(Math.random() * 6);
                 state.heldDie = val;
@@ -350,12 +358,13 @@
                     if(validCols.length === 0) { endGame(); return; }
 
                     let choice = validCols[Math.floor(Math.random() * validCols.length)];
+                    
                     for (let c of validCols) {
                         if (state.p1[c].includes(val)) choice = c;
                     }
                     
                     commitMove(2, choice);
-                }, 600);
+                }, 800);
             }
         }, 50);
     }
@@ -397,9 +406,9 @@
     }
 
     function checkFull(board) {
-        let diceCount = 0;
-        board.forEach(c => diceCount += c.length);
-        return diceCount === 9;
+        let count = 0;
+        board.forEach(c => count += c.length);
+        return count === 9;
     }
 
     function renderPreview(val) {
@@ -429,7 +438,7 @@
         const stage = document.getElementById('game-stage');
         const h = window.innerHeight;
         const w = window.innerWidth;
-        const scale = Math.min(w / 1100, h / 1450); 
+        const scale = Math.min(w / 1100, (h - 20) / 1450); 
         stage.style.transform = `scale(${scale})`;
     }
 
